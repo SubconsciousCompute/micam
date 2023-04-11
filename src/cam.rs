@@ -33,18 +33,3 @@ pub fn pid_using_camera() -> Vec<i32> {
     }
     pids
 }
-
-#[test]
-fn test_get_cam_devices() {
-    let cams = get_cam_devices();
-    // Test will only pass if your device has atleast 1 camera input.
-    assert!(cams.len() > 0);
-}
-
-#[test]
-fn test_pid_using_camera() {
-    let _cam = std::fs::File::open("/dev/video0");
-    let pids = pid_using_camera();
-    assert!(pids.len() > 0);
-    eprintln!("{pids:?}");
-}
