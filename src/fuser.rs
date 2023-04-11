@@ -1,21 +1,26 @@
+//! A basic functionality replacing the use of `fuser` command on linux
 use std::fs;
 
-pub fn get_pid_using_file(file_path: &str) -> Option<i32> {
-    // Read the list of processes in /proc
+/// Get the PIDs of all the process that have openend the file.
+pub(crate) fn fusers(file_path: &str) -> Vec<i32> {
+    let mut pids = Vec::new();
     if let Ok(entries) = fs::read_dir("/proc") {
         for entry in entries {
-            if let Ok(entry_name) = entry.unwrap().file_name().into_string() {
-                if let Ok(pid) = entry_name.parse::<i32>() {
-                    // Read the file descriptors of the process
-                    println!("{}", "here before");
-                    if let Ok(fd_entries) = fs::read_dir(format!("/proc/{}/fd", pid)) {
-                        println!("{}", "here after");
-                        for fd_entry in fd_entries.flatten() {
-                            if let Ok(link_target) = fs::read_link(fd_entry.path()) {
-                                if let Some(link_target_str) = link_target.to_str() {
-                                    // Check if the link target matches the file path
-                                    if link_target_str == file_path {
-                                        return Some(pid);
+            if let Ok(ref entry) = entry {
+                let meta = entry.metadata();
+                if meta.is_ok() && meta.unwrap().is_dir() {
+                    if let Ok(ref pid) = entry.file_name().into_string().unwrap().parse::<i32>() {
+                        if let Ok(fds) = fs::read_dir(format!("/proc/{}/fd", pid)) {
+                            // Using named for loop so that it can be breaked at once if we find fd
+                            // realted to file_path.
+                            // This loop lists out all the fds opened by a PID
+                            'fids_per_pid: for fd in fds.flatten() {
+                                if let Ok(ref opened_file) = fs::read_link(fd.path()) {
+                                    if let Some(open_file_name) = opened_file.to_str() {
+                                        if open_file_name == file_path {
+                                            pids.push(*pid);
+                                            break 'fids_per_pid;
+                                        }
                                     }
                                 }
                             }
@@ -25,10 +30,11 @@ pub fn get_pid_using_file(file_path: &str) -> Option<i32> {
             }
         }
     }
-    None
+    pids
 }
 
 #[test]
 fn test_pid_check() {
-    let _ = get_pid_using_file("/dev/video0");
+    let pid = fusers("/dev/video0");
+    eprintln!("{pid:?}");
 }
