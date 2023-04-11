@@ -32,9 +32,3 @@ pub(crate) fn fusers(file_path: &str) -> Vec<i32> {
     }
     pids
 }
-
-#[test]
-fn test_pid_check() {
-    let pid = fusers("/dev/video0");
-    eprintln!("{pid:?}");
-}
