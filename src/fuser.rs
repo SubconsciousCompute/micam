@@ -33,6 +33,7 @@ pub(crate) fn fusers(file_path: &str) -> Vec<i32> {
     pids
 }
 
+/// Get name of the process from it's pid
 pub(crate) fn pid_name(pid: i32) -> Option<String> {
     let proc_path = format!("/proc/{}", pid);
     let status_path = std::path::Path::new(&proc_path).join("status");
