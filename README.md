@@ -4,7 +4,7 @@ Query which PID had opened the video device of the linux system.
 ## Usage
 ```rust
 let pids: Vec<i32> = crate::cam::pid_using_camera();
-let names: Vec<String> = crtae::cam::proc_using_camera();
+let names: Vec<String> = crate::cam::proc_using_camera();
 ```
 
 ## Woking
