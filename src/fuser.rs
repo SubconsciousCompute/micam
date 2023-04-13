@@ -32,3 +32,33 @@ pub(crate) fn fusers(file_path: &str) -> Vec<i32> {
     }
     pids
 }
+
+pub(crate) fn pid_name(pid: i32) -> Option<String> {
+    let proc_path = format!("/proc/{}", pid);
+    let status_path = std::path::Path::new(&proc_path).join("status");
+
+    if let Ok(file) = std::fs::File::open(status_path) {
+        let reader = std::io::BufReader::new(file);
+        use std::io::BufRead;
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                if line.starts_with("Name:") {
+                    let mut parts = line.split_whitespace();
+                    if let Some(name) = parts.nth(1) {
+                        return Some(name.to_string());
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+#[test]
+fn process_name_using_camera() {
+    let pnames: Vec<String> = fusers("/dev/video0")
+        .iter()
+        .map(|&pid| pid_name(pid).unwrap())
+        .collect();
+    println!("{:#?}", pnames);
+}
