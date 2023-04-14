@@ -3,3 +3,4 @@
 
 pub mod cam;
 pub(crate) mod fuser;
+pub mod mic;
