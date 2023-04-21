@@ -1,4 +1,4 @@
-use crate::fuser::{fusers, pid_name};
+use crate::fuser::{fusers, fusers_is_open, pid_name};
 
 /// List out all camera sources that can provide outside view
 /// This may be a web cam, or HDMI port that support video input even though it doesn't have any
@@ -42,8 +42,19 @@ pub fn proc_using_camera() -> Vec<String> {
     processes
 }
 
+pub fn is_cam_open() -> bool {
+    for cam in get_cam_devices() {
+        if fusers_is_open(cam.as_str()) {
+            return true;
+        }
+    }
+    false
+}
+
 #[test]
 fn test_cam_usage() {
+    let state = is_cam_open();
+    println!("Samera state {}", state);
     let procs = proc_using_camera();
     println!("{procs:#?}");
 }
