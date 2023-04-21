@@ -1,4 +1,4 @@
-use crate::fuser::{fusers, pid_name};
+use crate::fuser::{fusers, fusers_is_open, pid_name};
 
 /// List out all microphone sources that can provide sound input
 /// This can be integrated mic, or HDMI input etc.
@@ -42,6 +42,15 @@ pub fn proc_using_mic() -> Vec<String> {
         processes.push(pid_name(pid).unwrap_or(format!("Unknow PID {}", pid)));
     }
     processes
+}
+
+pub fn is_mic_open() -> bool {
+    for mic in get_mic_devices() {
+        if fusers_is_open(mic.as_str()) {
+            return true;
+        }
+    }
+    false
 }
 
 #[test]
