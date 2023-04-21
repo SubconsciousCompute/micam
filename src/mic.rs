@@ -18,6 +18,7 @@ pub fn get_mic_devices() -> Vec<String> {
             mic_devices.push(path_str);
         }
     }
+    // Add other mic devices, Which may be present.
     mic_devices.push("/dev/audio".to_string());
     mic_devices.push("/dev/dsp".to_string());
     mic_devices
