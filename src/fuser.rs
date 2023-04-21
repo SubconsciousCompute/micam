@@ -85,4 +85,6 @@ fn process_name_using_camera() {
         .map(|&pid| pid_name(pid).unwrap())
         .collect();
     println!("{:#?}", pnames);
+    let is_open = fusers_is_open("/dev/video0");
+    println!("{is_open}");
 }
