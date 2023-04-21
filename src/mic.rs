@@ -18,6 +18,8 @@ pub fn get_mic_devices() -> Vec<String> {
             mic_devices.push(path_str);
         }
     }
+    mic_devices.push("/dev/audio".to_string());
+    mic_devices.push("/dev/dsp".to_string());
     mic_devices
 }
 
